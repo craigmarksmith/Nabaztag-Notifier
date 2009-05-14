@@ -1,0 +1,7 @@
+h2. What's this?
+
+A Nabaztag notifier for CruiseControl.rb
+
+h2. Installation
+
+# Copy the nabaztag_notifier folder from builder_plugins/available to builder_plugins/installed

@@ -1,0 +1,18 @@
+= Changes
+
+== 0.3.0
+
+* Understands new XML responses from API
+* Significant refactoring of response handling
+
+== 0.2.0
+
+* Version 2 API support
+* Can speak French or English
+* Added command-line utility, nabaztag-say
+* Added gem
+
+== 0.1
+
+* Initial release
+* Version 1 API only

@@ -1,0 +1,97 @@
+#!/usr/bin/env ruby
+
+require 'nabaztag'
+require 'optparse'
+load ENV['HOME'] + '/.nabaztag' rescue nil
+
+OPTIONS = {
+  :mac   => NABAZTAG_MAC,
+  :token => NABAZTAG_TOKEN,
+}
+
+class NabaztagSay
+  def list_voices
+    message = nabaztag.new_message
+    message.action = :get_voices
+    response = message.send
+    response.voices.each do |language, voices|
+      puts language
+      voices.sort.each do |v|
+        puts "  #{v}"
+      end
+    end
+  end
+
+  def nabaztag
+    @mabaztag ||= Nabaztag.new(OPTIONS[:mac], OPTIONS[:token])
+  end
+
+  def say!(sentence)
+    nabaztag.say!(sentence)
+  end
+  
+  def voice=(v)
+    nabaztag.voice = v
+  end
+end
+
+n = NabaztagSay.new
+
+ARGV.options do |o|
+  script_name = File.basename($0)
+
+  o.set_summary_indent('  ')
+  o.banner =    "Usage: #{script_name} [OPTIONS] TEXT-TO-SAY"
+  o.define_head "Tell Nabaztag to say something."
+  o.separator   ""
+  o.separator   "If you create a file in your home directory called .nabaztag"
+  o.separator   "containing the MAC and API token for your device, like this:"
+  o.separator   "  NABAZTAG_MAC = '00039XXXXXXX'"
+  o.separator   "  NABAZTAG_TOKEN = '1234XXXXXXXXXXX'"
+  o.separator   "then you need not specify the MAC and token on the command line."
+  o.separator   ""
+  o.separator   "Options:"
+
+  begin  
+    o.on(
+      "-m", "--mac=MAC", String,
+      "MAC address of device",
+      "Default is NABAZTAG_MAC in ~/.nabaztag"
+    ) { |OPTIONS[:mac]| }
+    o.on(
+      "-t", "--token=TOKEN", String,
+      "API token",
+      "Default is NABAZTAG_TOKEN in ~/.nabaztag"
+    ) { |OPTIONS[:token]| }
+    o.on(
+      "-v", "--voice=VOICE", String,
+      "Voice to use for speech"
+    ) { |OPTIONS[:voice]| }
+    o.on(
+      "-l", "--list-voices",
+      "List available voices and exit"
+    ) { 
+      n.list_voices
+      exit  
+    }
+    o.separator ""
+    o.on_tail("-h", "--help", "Show this help message.") { puts o; exit }
+    o.parse!
+
+    OPTIONS.each do |k,v|
+      if !v || v.empty?
+        raise RuntimeError, "Missing parameter #{v}"
+      end
+    end  
+    if ARGV.empty?
+      raise RuntimeError, "Nothing to say"
+    end
+  rescue StandardError => e
+    puts "Error: #{e.message}", ''
+    puts o
+    exit 1
+  end
+end
+
+n.voice = OPTIONS[:voice]
+n.say!(ARGV.join(' '))

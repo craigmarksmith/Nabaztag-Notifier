@@ -1,0 +1,22 @@
+= Nabaztag
+
+== About
+
+Nabaztag communication library for Ruby.
+
+The Nabaztag is a small electronic rabbit with lights, motorised ears, and speech.
+
+http://www.nabaztag.com/
+
+== Copying
+
+Copyright Revieworld Ltd. 2006
+
+You may use, copy and redistribute this library under the same terms as Ruby itself
+(http://www.ruby-lang.org/en/LICENSE.txt).
+
+== Installation
+
+To install (requires root/admin privileges):
+
+ # ruby setup.rb
