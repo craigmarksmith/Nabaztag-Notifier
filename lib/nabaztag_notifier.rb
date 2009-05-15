@@ -29,10 +29,10 @@ class NullChangeset
 end
 
 class NabaztagNotifier
-  NABAZTAG_MAC = '0013D3845142' 
+  NABAZTAG_MAC = '0013D3845142'
   NABAZTAG_TOKEN = '1189464819'
   NABAZTAG_VOICE = 'UK-Shirley'
-  
+
   BREAKAGE_ANNOUNCEMENTS = [
     "Oh dear! $PROJECT$ build was broken by $PERSON$.",
     "Warning! Warning! $PROJECT$ build is broken! It was $PERSON$ what done it!",
@@ -48,7 +48,7 @@ class NabaztagNotifier
     @nabaztag = Nabaztag.new(NABAZTAG_MAC, NABAZTAG_TOKEN)
     @nabaztag.voice = NABAZTAG_VOICE
   end
-  
+
   def logger
     CruiseControl::Log
   end
@@ -66,16 +66,16 @@ class NabaztagNotifier
     @nabaztag.move_ears(1, 1)
     @nabaztag.send
   end
-  
+
   private
     def changeset_for_build(build)
       changeset_parser.parse_log(build.changeset.split("\n")).first || NullChangeset.new
     end
-    
+
     def changeset_parser
       @changeset_parser ||= Subversion::ChangesetLogParser.new
     end
-    
+
     def announcement(build, announcement_templates)
       changeset = changeset_for_build(build)
       project_name = project_name(build.project.name)
@@ -85,21 +85,21 @@ class NabaztagNotifier
       announcement_template.gsub!('$PROJECT$', project_name)
       announcement_template
     end
-    
+
     def user_name(name)
       return USER_ALIASES[name] if USER_ALIASES.has_key?(name)
       return name
     end
-    
+
     def project_name(project)
       return PROJECT_ALIASES[project] if PROJECT_ALIASES.has_key?(project)
       return project
     end
-    
+
     def breakage_announcements
       BREAKAGE_ANNOUNCEMENTS
     end
-    
+
     def fixed_announcements
       FIXED_ANNOUNCEMENTS
     end
