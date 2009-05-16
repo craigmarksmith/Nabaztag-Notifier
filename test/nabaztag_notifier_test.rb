@@ -1,13 +1,8 @@
 require File.dirname(__FILE__) + '/test_helper'
 
-class Subversion
-  class ChangesetLogParser; end # stub for testing outside cruise
-end
-
 class NabaztagNotifierTest < Test::Unit::TestCase
 
   def setup
-    Subversion::ChangesetLogParser.stubs(:new).returns(@changeset_parser = mock('cc changeset parser'))
     @nabaztag_stub = stub_everything('nabaztag', :use_voice => nil)
     Nabaztag.stubs(:new).returns(@nabaztag_stub)
     @notifier = NabaztagNotifier.new
@@ -33,11 +28,11 @@ class NabaztagNotifierTest < Test::Unit::TestCase
 
   def test_should_announce_breakage_on_broken_build
     @nabaztag_stub.stubs(:move_ears)
-    @nabaztag_stub.expects(:say).with("Oh dear! Build for review world was broken by Luke.")
+    @nabaztag_stub.expects(:say).with("Oh dear! Build for Reevoo was broken by Tom.")
     @nabaztag_stub.expects(:send)
-    @build_stub = stub('build', :changeset => "foo\nbar", :project => stub(:name => 'revieworld'))
-    @changeset_parser.expects(:parse_log).with(['foo', 'bar']).returns([changeset=stub('changeset')])
-    changeset.stubs(:committed_by).returns('lukeredpath')
+    source_control = stub_everything('git', :latest_revision => stub_everything(:author => "tomlea"))
+    project = stub_everything("reevoo", :source_control => source_control, :name => 'Reevoo')
+    @build_stub = stub('build', :project => project)
     @notifier.build_broken(@build_stub, 'test')
   end
 
@@ -51,22 +46,27 @@ class NabaztagNotifierTest < Test::Unit::TestCase
 
   def test_should_announce_fixed_build
     @nabaztag_stub.stubs(:move_ears)
-    @nabaztag_stub.expects(:say).with("Hooray! James Mead has fixed the reevoo mark build.")
+    @nabaztag_stub.expects(:say).with("Hooray! James Mead has fixed the Reevoo build.")
     @nabaztag_stub.expects(:send)
-    @build_stub = stub('build', :changeset => "foo\nbar", :project => stub(:name => 'reevoomark'))
-    @changeset_parser.expects(:parse_log).with(['foo', 'bar']).returns([changeset=stub('changeset')])
-    changeset.stubs(:committed_by).returns('jamesmead')
+    
+    source_control = stub_everything('git', :latest_revision => stub_everything(:author => "James Mead"))
+    project = stub_everything("reevoo", :source_control => source_control, :name => 'Reevoo')
+    @build_stub = stub('build', :project => project)
+    
     @notifier.build_fixed(@build_stub, 'test')
   end
 
   def test_should_announce_a_fixed_build_when_there_is_no_available_changeset
     @nabaztag_stub.stubs(:move_ears)
-    @nabaztag_stub.expects(:say).with("Hooray! Ya Mum has fixed the reevoo mark build.")
+    @nabaztag_stub.expects(:say).with("Hooray! Ya Mum has fixed the Reevoo build.")
     @nabaztag_stub.expects(:send)
-    @build_stub = stub('build', :changeset => "foo\nbar", :project => stub(:name => 'reevoomark'))
-    @changeset_parser.expects(:parse_log).with(['foo', 'bar']).returns([nil])
-    NullChangeset.any_instance.stubs(:committed_by).returns('Ya Mum')
+    
+    source_control = stub_everything('git', :latest_revision => nil)
+    project = stub_everything("reevoo", :source_control => source_control, :name => 'Reevoo')
+    @build_stub = stub('build', :project => project)
+    NullChangeset.any_instance.stubs(:author).returns('Ya Mum')
+    
     @notifier.build_fixed(@build_stub, 'test')
   end
-
+  
 end

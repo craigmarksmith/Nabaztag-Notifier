@@ -22,7 +22,7 @@ PROJECT_ALIASES = {
 }
 
 class NullChangeset
-  def committed_by
+  def author
     "Some scoundrel"
   end
 end
