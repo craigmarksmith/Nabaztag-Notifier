@@ -1,24 +1,23 @@
 require File.join(File.dirname(__FILE__), *%w[wiki_quotes])
 
 USER_ALIASES = {
-  'lukeredpath' => "Luke",
-  'paulbattley' => "Paul",
-  'chrisroos' => "Chris",
   'bensales' => "Ben",
+  'Ben Sales <bensales@reevoo.com>' => 'Ben',
   'louisg' => "Loo-wee",
-  'jamesadam' => "James Adam",
-  'adamjames' => "Adam",
-  'jamesmead' => "James Mead",
-  'alexmaccaw' => "Alex",
+  "Louis Garman <louisgarman@reevoo.com>" => 'Loo-wee',
   'craigsmith' => "Craig",
-  'tomlea' => "Tom"
+  'Craig Smith <craigsmith@reevoo.com>' => 'Craig',
+  'tomlea' => "Tom",
+  "Tom Lea <commit@tomlea.co.uk>" => "Tom",
+  "Adam Johnson <adam@pkqk.net>" => 'Adam',
+  "Matt House <matthouse@reevoo.com>" => 'Matt'
 }
 
 PROJECT_ALIASES = {
   'reevoo' => 'reevoo dot com',
   'reevoomark' => 'reevoo mark',
   'revieworld' => 'review world',
-  'revieworld-reevoomark' => 'review-world ree-voo-mark integration',
+  'revieworld-reevoomark' => 'review world reevoo mark integration',
   'plugins' => 'plug-ins'
 }
 
@@ -69,17 +68,14 @@ class NabaztagNotifier
 
   private
     def changeset_for_build(build)
-      changeset_parser.parse_log(build.changeset.split("\n")).first || NullChangeset.new
-    end
-
-    def changeset_parser
-      @changeset_parser ||= Subversion::ChangesetLogParser.new
+      parsed_log = build.project.source_control.latest_revision
+      return parsed_log || NullChangeset.new
     end
 
     def announcement(build, announcement_templates)
       changeset = changeset_for_build(build)
       project_name = project_name(build.project.name)
-      person = user_name(changeset.committed_by)
+      person = user_name(changeset.author)
       announcement_template = announcement_templates.random_value
       announcement_template.gsub!('$PERSON$', person)
       announcement_template.gsub!('$PROJECT$', project_name)
