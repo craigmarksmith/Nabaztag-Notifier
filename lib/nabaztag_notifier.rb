@@ -40,7 +40,7 @@ class NabaztagNotifier
   ]
 
   FIXED_ANNOUNCEMENTS = [
-    "$PERSON$ fixed the $PROJECT$ build. Normal service has resumed. #{WikiQuotes.random_quote}"
+    "$PERSON$ fixed the $PROJECT$ build. Normal service has resumed. $WIKI_QUOTE$"
   ]
 
   def initialize(project = nil)
@@ -77,8 +77,9 @@ class NabaztagNotifier
       project_name = project_name(build.project.name)
       person = user_name(changeset.author)
       announcement_template = announcement_templates.random_value
-      announcement_template.gsub!('$PERSON$', person)
-      announcement_template.gsub!('$PROJECT$', project_name)
+      announcement_template.gsub('$PERSON$', person)
+      announcement_template.gsub('$PROJECT$', project_name)
+      announcement_template.gsub('$WIKI_QUOTE$', WikiQuotes.random_quote)
       announcement_template
     end
 
