@@ -76,10 +76,10 @@ class NabaztagNotifier
       changeset = changeset_for_build(build)
       project_name = project_name(build.project.name)
       person = user_name(changeset.author)
-      announcement_template = announcement_templates.random_value
-      announcement_template.gsub('$PERSON$', person)
-      announcement_template.gsub('$PROJECT$', project_name)
-      announcement_template.gsub('$WIKI_QUOTE$', WikiQuotes.random_quote)
+      announcement_template = announcement_templates.random_value.dup
+      announcement_template.gsub!('$PERSON$', person)
+      announcement_template.gsub!('$PROJECT$', project_name)
+      announcement_template.gsub!('$WIKI_QUOTE$', WikiQuotes.random_quote)
       announcement_template
     end
 
